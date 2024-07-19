@@ -1,0 +1,30 @@
+@import "./preflight";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    BODY {
+        @apply h-screen font-sans text-zinc-900;
+        font-family: "Inter", sans-serif;
+    }
+
+    #root {
+        @apply h-full;
+    }
+
+    INPUT,
+    TEXTAREA,
+    BUTTON,
+    SELECT,
+    A {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    BUTTON::-moz-focus-inner,
+    INPUT::-moz-focus-inner {
+        border: 0;
+        padding: 0;
+    }
+}
