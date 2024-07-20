@@ -130,6 +130,20 @@ const Matchmaking: React.FC = () => {
         }
     };
 
+    const handleNextMatch = () => {
+        if (callRef.current) {
+            callRef.current.close();
+            callRef.current = null;
+        }
+        if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = null;
+        }
+        setRemotePeerId(null);
+        setRoom(null);
+        setChatMessages([]);
+        handleMatchmaking();
+    };
+
     const handleChatInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setChatMessage(event.target.value);
     };
@@ -154,33 +168,29 @@ const Matchmaking: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
-            <button
-                onClick={handleMatchmaking}
-                className="px-4 py-2 mb-4 text-white bg-blue-500 rounded hover:bg-blue-700"
-                disabled={isWaiting}
-            >
-                {isWaiting ? 'Waiting for a match...' : 'Find a Random Match'}
-            </button>
-            {message && <p>{message}</p>}
+        <div
+            className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 text-white p-4">
+            {message && <p className="text-lg font-semibold mb-4">{message}</p>}
             {room && (
-                <div className="mt-4">
-                    <p>Room URL: {room.roomURL}</p>
-                    <p>Room ID: {room.roomId}</p>
-                    <div className="video-container flex">
+                <div className="w-full max-w-md lg:max-w-lg">
+                    <p className="text-sm mb-1">Room URL: {room.roomURL}</p>
+                    <p className="text-sm mb-4">Room ID: {room.roomId}</p>
+                    <div className="video-container grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div className="flex flex-col items-center">
-                            <span className="mb-2">Your Video</span>
-                            <video ref={myVideoRef} className="w-64 h-48 bg-black" autoPlay playsInline muted/>
+                            <span className="mb-2 text-base font-medium">Your Video</span>
+                            <video ref={myVideoRef} className="w-full h-48 md:h-64 bg-black rounded-lg" autoPlay
+                                   playsInline muted/>
                         </div>
                         <div className="flex flex-col items-center">
-                            <span className="mb-2">Remote Video</span>
-                            <video ref={remoteVideoRef} className="w-64 h-48 bg-black" autoPlay playsInline/>
+                            <span className="mb-2 text-base font-medium">Remote Video</span>
+                            <video ref={remoteVideoRef} className="w-full h-48 md:h-64 bg-black rounded-lg" autoPlay
+                                   playsInline/>
                         </div>
                     </div>
                 </div>
             )}
-            <div className="chat-container mt-4 w-full max-w-md">
-                <div className="chat-messages bg-gray-800 p-4 rounded overflow-y-auto h-64 mb-4">
+            <div className="chat-container mt-4 w-full max-w-md lg:max-w-lg">
+                <div className="chat-messages bg-gray-800 p-4 rounded-lg overflow-y-auto h-48 mb-4 shadow-lg">
                     {chatMessages.map((msg, index) => (
                         <p key={index} className="text-sm mb-2">{msg}</p>
                     ))}
@@ -190,18 +200,33 @@ const Matchmaking: React.FC = () => {
                         type="text"
                         value={chatMessage}
                         onChange={handleChatInputChange}
-                        className="flex-1 p-2 rounded-l bg-gray-700 border border-gray-600 focus:outline-none"
+                        className="flex-1 p-2 rounded-l bg-gray-700 border border-gray-600 focus:outline-none focus:ring focus:ring-blue-500"
                         placeholder="Type a message..."
                     />
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-blue-500 rounded-r hover:bg-blue-700"
+                        className="px-4 py-2 bg-blue-500 rounded-r hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
                     >
                         Send
                     </button>
                 </form>
             </div>
+            <button
+                onClick={handleNextMatch}
+                className="mt-6 px-6 py-2 text-lg font-medium bg-red-500 rounded-lg hover:bg-red-700 focus:outline-none focus:ring focus:ring-red-300"
+            >
+                {isWaiting ? 'Searching for a match...' : 'Next'}
+            </button>
         </div>
+
+        // <div className="flex flex-1 w-full overflow-hidden">
+        //     <div className="relative flex-1">
+        //         <video src="/noise.mp4" muted autoPlay loop className="w-full h-full object-cover"/>
+        //     </div>
+        //     <div className="relative flex-1">
+        //         <video src="/loading.mp4" muted autoPlay loop className="w-full h-full object-cover"/>
+        //     </div>
+        // </div>
     );
 };
 
