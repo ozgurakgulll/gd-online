@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'react';
-import { useSocket } from "../context/SocketContext";
-import Peer, { MediaConnection } from 'peerjs';
-import { Room } from "../@types/socket";
+import React, {ChangeEvent, FormEvent, useEffect, useRef, useState} from 'react';
+import {useSocket} from "../context/SocketContext";
+import Peer, {MediaConnection} from 'peerjs';
+import {Room} from "../@types/socket";
 
 const Matchmaking: React.FC = () => {
     const socket = useSocket();
@@ -171,24 +171,22 @@ const Matchmaking: React.FC = () => {
         <div
             className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 text-white p-4">
             {message && <p className="text-lg font-semibold mb-4">{message}</p>}
-            {room && (
                 <div className="w-full max-w-md lg:max-w-lg">
-                    <p className="text-sm mb-1">Room URL: {room.roomURL}</p>
-                    <p className="text-sm mb-4">Room ID: {room.roomId}</p>
                     <div className="video-container grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                         <div className="flex flex-col items-center">
                             <span className="mb-2 text-base font-medium">Your Video</span>
-                            <video ref={myVideoRef} className="w-full h-48 md:h-64 bg-black rounded-lg" autoPlay
-                                   playsInline muted/>
+                            <video ref={myVideoRef} src="/loading.mp4"
+                                   className="w-full h-full object-cover bg-black rounded-lg" autoPlay
+                                   playsInline muted loop/>
                         </div>
                         <div className="flex flex-col items-center">
                             <span className="mb-2 text-base font-medium">Remote Video</span>
-                            <video ref={remoteVideoRef} className="w-full h-48 md:h-64 bg-black rounded-lg" autoPlay
-                                   playsInline/>
+                            <video ref={remoteVideoRef} src="/noise.mp4"
+                                   className="w-full h-full object-cover bg-black rounded-lg" autoPlay
+                                   playsInline loop/>
                         </div>
                     </div>
                 </div>
-            )}
             <div className="chat-container mt-4 w-full max-w-md lg:max-w-lg">
                 <div className="chat-messages bg-gray-800 p-4 rounded-lg overflow-y-auto h-48 mb-4 shadow-lg">
                     {chatMessages.map((msg, index) => (
@@ -219,14 +217,7 @@ const Matchmaking: React.FC = () => {
             </button>
         </div>
 
-        // <div className="flex flex-1 w-full overflow-hidden">
-        //     <div className="relative flex-1">
-        //         <video src="/noise.mp4" muted autoPlay loop className="w-full h-full object-cover"/>
-        //     </div>
-        //     <div className="relative flex-1">
-        //         <video src="/loading.mp4" muted autoPlay loop className="w-full h-full object-cover"/>
-        //     </div>
-        // </div>
+
     );
 };
 
