@@ -1,7 +1,8 @@
 import React, {ChangeEvent, FormEvent, useEffect, useRef, useState} from 'react';
-import {useSocket} from "../context/SocketContext";
+import {useSocket} from "@/context/SocketContext";
 import Peer, {MediaConnection} from 'peerjs';
-import {Room} from "../@types/socket";
+import {Room} from "@/@types/socket";
+import {BannerHero} from "./bannerHero";
 
 const Matchmaking: React.FC = () => {
     const socket = useSocket();
@@ -16,7 +17,7 @@ const Matchmaking: React.FC = () => {
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const peerRef = useRef<Peer | null>(null);
     const callRef = useRef<MediaConnection | null>(null);
-
+    const [first ,setFirst]=useState(false)
     useEffect(() => {
         if (!socket) return;
 
@@ -124,6 +125,7 @@ const Matchmaking: React.FC = () => {
     };
 
     const handleMatchmaking = () => {
+  setFirst(true)
         if (socket && peerId) {
             console.log('Emitting events with peerId:', peerId);
             socket.emit('events', { peerId });
@@ -168,56 +170,61 @@ const Matchmaking: React.FC = () => {
     };
 
     return (
-        <div
-            className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 text-white p-4">
-            {message && <p className="text-lg font-semibold mb-4">{message}</p>}
-                <div className="w-full max-w-md lg:max-w-lg">
-                    <div className="video-container grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                        <div className="flex flex-col items-center">
-                            <span className="mb-2 text-base font-medium">Your Video</span>
-                            <video ref={myVideoRef} src="/loading.mp4"
-                                   className="w-full h-full object-cover bg-black rounded-lg" autoPlay
-                                   playsInline muted loop/>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <span className="mb-2 text-base font-medium">Remote Video</span>
-                            <video ref={remoteVideoRef} src="/noise.mp4"
-                                   className="w-full h-full object-cover bg-black rounded-lg" autoPlay
-                                   playsInline loop/>
+        <>
+            {first ? (
+                <div className={`flex flex-col items-center justify-center min-h-screen from-gray-900 to-gray-700 text-white p-4 ${first ? 'slide-in-top' : ''}`}>
+                    <span onClick={() => setFirst(false)}>Geri</span>
+
+                    {message && <p className="text-lg font-semibold mb-4">{message}</p>}
+                    <div className="w-full max-w-md lg:max-w-lg">
+                        <div className="video-container grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div className="flex flex-col items-center">
+                                <span className="mb-2 text-base font-medium">Your Video</span>
+                                <video ref={myVideoRef} src="/loading.mp4"
+                                       className="w-full h-full object-cover bg-black rounded-lg" autoPlay
+                                       playsInline muted loop />
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <span className="mb-2 text-base font-medium">Remote Video</span>
+                                <video ref={remoteVideoRef} src="/noise.mp4"
+                                       className="w-full h-full object-cover bg-black rounded-lg" autoPlay
+                                       playsInline loop />
+                            </div>
                         </div>
                     </div>
-                </div>
-            <div className="chat-container mt-4 w-full max-w-md lg:max-w-lg">
-                <div className="chat-messages bg-gray-800 p-4 rounded-lg overflow-y-auto h-48 mb-4 shadow-lg">
-                    {chatMessages.map((msg, index) => (
-                        <p key={index} className="text-sm mb-2">{msg}</p>
-                    ))}
-                </div>
-                <form onSubmit={handleChatSubmit} className="flex">
-                    <input
-                        type="text"
-                        value={chatMessage}
-                        onChange={handleChatInputChange}
-                        className="flex-1 p-2 rounded-l bg-gray-700 border border-gray-600 focus:outline-none focus:ring focus:ring-blue-500"
-                        placeholder="Type a message..."
-                    />
+                    <div className="chat-container mt-4 w-full max-w-md lg:max-w-lg">
+                        <div className="chat-messages bg-gray-800 p-4 rounded-lg overflow-y-auto h-48 mb-4 shadow-lg">
+                            {chatMessages.map((msg, index) => (
+                                <p key={index} className="text-sm mb-2">{msg}</p>
+                            ))}
+                        </div>
+                        <form onSubmit={handleChatSubmit} className="flex">
+                            <input
+                                type="text"
+                                value={chatMessage}
+                                onChange={handleChatInputChange}
+                                className="flex-1 p-2 rounded-l bg-gray-700 border border-gray-600 focus:outline-none focus:ring focus:ring-blue-500"
+                                placeholder="Type a message..."
+                            />
+                            <button
+                                type="submit"
+                                className="px-4 py-2 bg-blue-500 rounded-r hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
+                            >
+                                Send
+                            </button>
+                        </form>
+                    </div>
                     <button
-                        type="submit"
-                        className="px-4 py-2 bg-blue-500 rounded-r hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
+                        onClick={handleNextMatch}
+                        className="mt-6 px-6 py-2 text-lg font-medium bg-red-500 rounded-lg hover:bg-red-700 focus:outline-none focus:ring focus:ring-red-300"
                     >
-                        Send
+                        {isWaiting ? 'Searching for a match...' : 'Next'}
                     </button>
-                </form>
-            </div>
-            <button
-                onClick={handleNextMatch}
-                className="mt-6 px-6 py-2 text-lg font-medium bg-red-500 rounded-lg hover:bg-red-700 focus:outline-none focus:ring focus:ring-red-300"
-            >
-                {isWaiting ? 'Searching for a match...' : 'Next'}
-            </button>
-        </div>
-
-
+                </div>
+            ) : (
+                <BannerHero start={() => handleMatchmaking()} className="slide-in-bottom" />
+            )}
+        </>
     );
 };
 

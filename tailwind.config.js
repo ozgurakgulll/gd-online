@@ -7,12 +7,14 @@ module.exports = {
   },
   theme: {
     extend: {
-
-      gridTemplateRows: {
-        12: "repeat(12, minmax(0, 1fr))",
+      backgroundImage: {
+        "cta-img": "url('/mic.png')",
       },
-      gridRow: {
-        "span-10": "span 10 / span 10",
+      colors: {
+        primary: "#ED7F39",
+      },
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
       },
     },
   },
