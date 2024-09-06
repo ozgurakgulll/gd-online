@@ -14,63 +14,39 @@ body{
     }
 }
 
-@keyframes slideInTop {
-    from {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+.video-container img {
+    @apply rounded-lg;
 }
 
-@keyframes slideInBottom {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+.chat-container {
+    @apply flex flex-col  rounded-lg space-y-4;
 }
 
-@keyframes slideOutTop {
-    from {
-        transform: translateY(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
+.chat-messages {
+    background: rgb(193 132 35 / 2%);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(193, 132, 35, 0.3);
+    @apply flex-grow space-y-2 overflow-y-auto;
 }
 
-@keyframes slideOutBottom {
-    from {
-        transform: translateY(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateY(100%);
-        opacity: 0;
-    }
+.chat-messages .message {
+    @apply p-2 rounded-md;
 }
 
-/* Apply the animations */
-.slide-in-top {
-    animation: slideInTop 0.5s ease-out forwards;
-}
 
-.slide-in-bottom {
-    animation: slideInBottom 0.5s ease-out forwards;
-}
 
-.slide-out-top {
-    animation: slideOutTop 0.5s ease-in forwards;
-}
 
-.slide-out-bottom {
-    animation: slideOutBottom 0.5s ease-in forwards;
+
+/*.chat-input button {*/
+/*    @apply p-2 bg-blue-600 text-white rounded-r-lg;*/
+/*}*/
+
+/*.stop-button {*/
+/*    @apply p-2 bg-red-600 text-white rounded-lg;*/
+/*}*/
+.app-border{
+    border: 3px solid rgba(237, 127, 57, 0.25);
 }
