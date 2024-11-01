@@ -22,9 +22,8 @@ root.render(
     <ConfigProvider
         theme={{
             token: {
-                colorPrimary: "#0F766E",
-                controlOutlineWidth: 0, // input and button shadow
-                // look at support menu and hold the pop-up tab
+                colorPrimary: "#ED7F39",
+                controlOutlineWidth: 0,
             },
         }}
     > <RouterProvider router={routes}></RouterProvider>
