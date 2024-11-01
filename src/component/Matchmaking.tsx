@@ -3,8 +3,14 @@ import {useSocket} from "@/context/SocketContext";
 import Peer, {MediaConnection} from 'peerjs';
 import {Room} from "@/@types/socket";
 import {BannerHero} from "./bannerHero";
-import {Button, Input} from "antd";
-import {UserOutlined} from "@ant-design/icons";
+import {Button, Modal} from "antd";
+import {
+    AvatarCreator,
+    AvatarCreatorConfig,
+    AvatarExportedEvent,
+    UserSetEvent
+} from "@readyplayerme/react-avatar-creator";
+import AvatarCostume from "@/component/AvatarCostume";
 
 const Matchmaking: React.FC = () => {
     const socket = useSocket();
@@ -20,6 +26,7 @@ const Matchmaking: React.FC = () => {
     const peerRef = useRef<Peer | null>(null);
     const callRef = useRef<MediaConnection | null>(null);
     const [first ,setFirst]=useState(false)
+    const [avatarUrl,setAvatarUrl]=useState("")
     useEffect(() => {
         if (!socket) return;
 
@@ -127,10 +134,13 @@ const Matchmaking: React.FC = () => {
     };
 
     const handleMatchmaking = () => {
-  setFirst(true)
+        // setFirst(true)
         if (socket && peerId) {
             console.log('Emitting events with peerId:', peerId);
-            socket.emit('events', { peerId });
+            socket.emit('events', {peerId});
+        }
+        if (avatarRef.current) {
+            avatarRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     };
 
@@ -170,108 +180,122 @@ const Matchmaking: React.FC = () => {
     const handlePeerData = (data: any) => {
         setChatMessages((prevMessages) => [...prevMessages, data]);
     };
-    useEffect(() => {
-        console.log(chatMessages);
-    }, [chatMessages]);
+
+    const handleOnUserSet = (event: UserSetEvent) => {
+        console.log(`User ID is: ${event.data.id}`);
+    };
+
+    const handleOnAvatarExported = (event: AvatarExportedEvent) => {
+        console.log(`Avatar URL is: ${event.data.url}`);
+        setAvatarUrl(event.data.url)
+        setFirst(true)
+    };
+    const avatarRef = useRef<HTMLDivElement>(null);
     return (
         <>
-
             {first ? (
                 <div className={'h-screen  w-screen '}>
-                    <div>
-                        <header className=" px-16 py-2 flex lg:justify-between justify-center items-center h-full">
-                            <div className="flex items-center text-center p-3 ">
-                                <img src="logo.svg" alt="Omegle Logo"  className="lg:h-14  h-10 mr-5"/>
-                                <span
-                                    className="text-orange-500 font-bold text-xl mt-5 hidden sm:inline ">Gd Online</span>
-                            </div>
-                            <div className="flex space-x-4">
-                                <Button style={{...glassButtonStyle}}>
-                                    <span className="mr-1 text-pink-400">⚥</span>
-                                    <span className="hidden sm:inline">All</span>
-                                </Button>
-                                <Button
-                                    style={{...glassButtonStyle}}> <span className="mr-1 text-green-400">🌍</span>
-                                    <span className="hidden sm:inline">Global</span>
-                                </Button>
-                            </div>
-                        </header>
-                    </div >
-                    <div className="flex flex-col md:flex-row  px-16 py-6  border-t-4 border-indigo-500  justify-center"
-                         style={{borderTop: '1px solid #ed7f3938',height:'calc(100vh - 10rem)'}}>
-                        <div className={'w-full h-full flex  flex-col md:flex-row max-w-7xl'}>
-                            <div className="video-container flex flex-col space-y-4 md:space-y-4 md:w-1/3 ">
-                                <video ref={remoteVideoRef}
+                    <AvatarCostume urlAnime={avatarUrl}/>
+                    {/*<div>*/}
+                    {/*    <header className=" px-16 py-2 flex lg:justify-between justify-center items-center h-full">*/}
+                    {/*        <div className="flex items-center text-center p-3 ">*/}
+                    {/*            <img src="logo.svg" alt="Omegle Logo"  className="lg:h-14  h-10 mr-5"/>*/}
+                    {/*            <span*/}
+                    {/*                className="text-orange-500 font-bold text-xl mt-5 hidden sm:inline ">Gd Online</span>*/}
+                    {/*        </div>*/}
+                    {/*        <div className="flex space-x-4">*/}
+                    {/*            <Button style={{...glassButtonStyle}}>*/}
+                    {/*                <span className="mr-1 text-pink-400">⚥</span>*/}
+                    {/*                <span className="hidden sm:inline">All</span>*/}
+                    {/*            </Button>*/}
+                    {/*            <Button*/}
+                    {/*                style={{...glassButtonStyle}}> <span className="mr-1 text-green-400">🌍</span>*/}
+                    {/*                <span className="hidden sm:inline">Global</span>*/}
+                    {/*            </Button>*/}
+                    {/*        </div>*/}
+                    {/*    </header>*/}
+                    {/*</div >*/}
+                    {/*<div className="flex flex-col md:flex-row  px-16 py-6  border-t-4 border-indigo-500  justify-center"*/}
+                    {/*     style={{borderTop: '1px solid #ed7f3938',height:'calc(100vh - 10rem)'}}>*/}
+                    {/*    <div className={'w-full h-full flex  flex-col md:flex-row max-w-7xl'}>*/}
+                    {/*        <div className="video-container flex flex-col space-y-4 md:space-y-4 md:w-1/3 ">*/}
+                    {/*            <video ref={remoteVideoRef}*/}
 
-                                       src={"/noise.mp4"}
-                                       className="rounded-lg w-full md:h-1/2 object-cover app-border" autoPlay
-                                       playsInline loop/>
-                                <video ref={myVideoRef} src="/loading.mp4"
-                                       className="rounded-lg w-full md:h-1/2 object-cover app-border" autoPlay
-                                       playsInline muted loop/>
-                            </div>
-                            <div
-                                className="chat-container flex flex-col md:w-2/3  rounded-lg mt-4 md:mt-0 md:ml-4 space-y-4">
-                                <div className="chat-messages flex-grow space-y-2 overflow-y-auto">
-                                    {chatMessages.map((msg, index) => (
-                                        <div
-                                            key={index}
-                                            className={`message ${msg.includes('You:') ? 'text-right text-blue-400' : 'text-left text-gray-400'}`}
-                                        >
-                                            {msg}
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="chat-input flex">
-                                    <form onSubmit={handleChatSubmit} className="flex w-full">
-                                        {/*<input*/}
-                                        {/*    type="text"*/}
-                                        {/*    value={chatMessage}*/}
-                                        {/*    onChange={handleChatInputChange}*/}
-                                        {/*    className="flex-grow p-2 bg-gray-800 text-white rounded-l-lg"*/}
-                                        {/*    placeholder="Type a message..."*/}
-                                        {/*/>*/}
-                                        {/*<button*/}
-                                        {/*    type="submit"*/}
-                                        {/*    className="p-2 bg-blue-600 text-white rounded-r-lg"*/}
-                                        {/*>*/}
-                                        {/*    Send*/}
-                                        {/*</button>*/}
-                                        <div
-                                            className=' flex flex-col items-center justify-center w-full h-full text-white'>
-                                            <div className=' w-full flex justify-center relative'>
-                                                <input type='text'
-                                                       value={chatMessage}
-                                                       onChange={handleChatInputChange}
-                                                       style={{border:'none'}}
-                                                       className=' w-full rounded-lg p-4 pr-16 bg-slate-800 text-white'
-                                                       placeholder='Type your message here...'/>
+                    {/*                   src={"/noise.mp4"}*/}
+                    {/*                   className="rounded-lg w-full md:h-1/2 object-cover app-border" autoPlay*/}
+                    {/*                   playsInline loop/>*/}
+                    {/*            <video ref={myVideoRef} src="/loading.mp4"*/}
+                    {/*                   className="rounded-lg w-full md:h-1/2 object-cover app-border" autoPlay*/}
+                    {/*                   playsInline muted loop/>*/}
+                    {/*        </div>*/}
+                    {/*        <div*/}
+                    {/*            className="chat-container flex flex-col md:w-2/3  rounded-lg mt-4 md:mt-0 md:ml-4 space-y-4">*/}
+                    {/*            <div className="chat-messages flex-grow space-y-2 overflow-y-auto">*/}
+                    {/*                {chatMessages.map((msg, index) => (*/}
+                    {/*                    <div*/}
+                    {/*                        key={index}*/}
+                    {/*                        className={`message ${msg.includes('You:') ? 'text-right text-blue-400' : 'text-left text-gray-400'}`}*/}
+                    {/*                    >*/}
+                    {/*                        {msg}*/}
+                    {/*                    </div>*/}
+                    {/*                ))}*/}
+                    {/*            </div>*/}
+                    {/*            <div className="chat-input flex">*/}
+                    {/*                <form onSubmit={handleChatSubmit} className="flex w-full">*/}
+                    {/*                    /!*<input*!/*/}
+                    {/*                    /!*    type="text"*!/*/}
+                    {/*                    /!*    value={chatMessage}*!/*/}
+                    {/*                    /!*    onChange={handleChatInputChange}*!/*/}
+                    {/*                    /!*    className="flex-grow p-2 bg-gray-800 text-white rounded-l-lg"*!/*/}
+                    {/*                    /!*    placeholder="Type a message..."*!/*/}
+                    {/*                    /!*//*/}
+                    {/*                    /!*<button*!/*/}
+                    {/*                    /!*    type="submit"*!/*/}
+                    {/*                    /!*    className="p-2 bg-blue-600 text-white rounded-r-lg"*!/*/}
+                    {/*                    /!*>*!/*/}
+                    {/*                    /!*    Send*!/*/}
+                    {/*                    /!*</button>*!/*/}
+                    {/*                    <div*/}
+                    {/*                        className=' flex flex-col items-center justify-center w-full h-full text-white'>*/}
+                    {/*                        <div className=' w-full flex justify-center relative'>*/}
+                    {/*                            <input type='text'*/}
+                    {/*                                   value={chatMessage}*/}
+                    {/*                                   onChange={handleChatInputChange}*/}
+                    {/*                                   style={{border:'none'}}*/}
+                    {/*                                   className=' w-full rounded-lg p-4 pr-16 bg-slate-800 text-white'*/}
+                    {/*                                   placeholder='Type your message here...'/>*/}
 
-                                                <button
-                                                    type="submit"
-                                                    className="p-2 bg-blue-600 text-white rounded-r-lg"
-                                                >
-                                                    Send
-                                                </button>
-                                            </div>
+                    {/*                            <button*/}
+                    {/*                                type="submit"*/}
+                    {/*                                className="p-2 bg-blue-600 text-white rounded-r-lg"*/}
+                    {/*                            >*/}
+                    {/*                                Send*/}
+                    {/*                            </button>*/}
+                    {/*                        </div>*/}
 
-                                        </div>
-                                    </form>
+                    {/*                    </div>*/}
+                    {/*                </form>*/}
 
-                                </div>
-                                <button
-                                    onClick={handleNextMatch}
-                                    className="mt-6 px-6 py-2 text-lg font-medium bg-red-500 rounded-lg hover:bg-red-700 focus:outline-none focus:ring focus:ring-red-300"
-                                >
-                                    {isWaiting ? 'Searching for a match...' : 'Next'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    {/*            </div>*/}
+                    {/*            <button*/}
+                    {/*                onClick={handleNextMatch}*/}
+                    {/*                className="mt-6 px-6 py-2 text-lg font-medium bg-red-500 rounded-lg hover:bg-red-700 focus:outline-none focus:ring focus:ring-red-300"*/}
+                    {/*            >*/}
+                    {/*                {isWaiting ? 'Searching for a match...' : 'Next'}*/}
+                    {/*            </button>*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
                 </div>
             ) : (
                 <BannerHero start={() => handleMatchmaking()} className="slide-in-bottom"/>
             )}
+            {
+                !first && <div ref={avatarRef}>
+                    <AvatarCreator subdomain="test-x5jtk7" config={config} style={style} onUserSet={handleOnUserSet}
+                                   onAvatarExported={handleOnAvatarExported}/>
+                </div>
+            }
         </>
     );
 };
@@ -285,4 +309,12 @@ const glassButtonStyle = {
     WebkitBackdropFilter: 'blur(10px)',
     transition: 'background 0.3s ease',
 };
+const config: AvatarCreatorConfig = {
+    clearCache: false,
+    bodyType: 'fullbody',
+    quickStart: true,
+    language: 'tr',
+};
+
+const style = { width: '100%', height: '100vh', border: 'none' };
 export default Matchmaking;
